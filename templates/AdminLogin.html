@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Admin Login</title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+{#        <script src="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"></script>#}
+        <!-- Latest compiled and minified JavaScript -->
+        <script type="text/css" src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <h2>Admin Login</h2>
+        <div class="container p-3 my-3 border">
+            {% from "FormHelpers.html" import render_field %}
+            <form method=post>
+                <dl>
+                <div class="col text-center" >
+                    {{ render_field(form.username) }}
+                </div>
+                <br>
+                <div class="col text-center">
+                    {{ render_field(form.password) }}
+                </div>
+                </dl>
+                <div class="col text-center">
+        {#      <input type=submit value=Submit>#}
+                    <button type="submit" class="btn btn-primary center">Login</button>
+                </div>
+            </formdiv>
+    </body>
+</html>

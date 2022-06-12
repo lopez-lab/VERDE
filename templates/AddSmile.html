@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add SMILE to Database</title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+        <!-- Latest compiled and minified JavaScript -->
+        <script type="text/css" src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+        <!-- Marvin Sketch scripts -->
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/doc.css') }}" />
+        <script src="https://marvinjs.chemicalize.com/v1/de6161f6e04b4c298dce79c22594ea37/client-settings.js"></script>
+        <script src="https://marvinjs.chemicalize.com/v1/client.js"></script>
+
+    </head>
+    <body>
+        <h2 style="text-align: center">Add SMILE to Database</h2>
+        <br>
+        <!-- Z. Hu, Marvin Sketch -->
+        <div id="marvin-sketch" style="width: 500px; height: 480px; margin: auto;"></div>
+        <!--
+        <button id="action-button" type="button" style="margin-left: 300px;">Get SMILE!</button>
+        <script>
+            ChemicalizeMarvinJs.createEditor("#marvin-sketch").then(function (marvin) {
+            function showDialog() {
+                marvin.exportStructure("smiles").then(function (smiles) {
+                    alert("Current molecule: " + smiles);
+                });
+            }
+
+            marvin.importStructure("name", "aspirin");
+            document.getElementById("action-button").addEventListener("click", showDialog);
+        });
+        </script>
+        -->
+        <div id="marvin-log" style="text-align: center"></div>
+        <script>
+            ChemicalizeMarvinJs.createEditor("#marvin-sketch").then(function (marvin) {
+                function handleMolChange() {
+                    marvin.exportStructure("smiles").then(function (smiles) {
+                        document.getElementById("marvin-log").innerHTML = "Molecule has been changed to: " + smiles;
+                    });
+                }
+
+                marvin.importStructure("name", "aspirin");
+                marvin.on("molchange", handleMolChange);
+            });
+            </script>
+        <br>
+        <div class="container p-3 my-3 border" style="width: 500px; height: 180px; margin: auto;">
+            {% from "FormHelpers.html" import render_field %}
+            <form method=post>
+                <dl>
+                <div class="col text-center">
+                    {{ render_field(form.smiles) }}
+                    Separate SMILES by ":"
+                </div>
+                </dl>
+                <div class="col text-center">
+        {#      <input type=submit value=Submit>#}
+                    <button type="submit" class="btn btn-primary center">Submit Request</button>
+                </div>
+            </formdiv>
+    </body>
+</html>

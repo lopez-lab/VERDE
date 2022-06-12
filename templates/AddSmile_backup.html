@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add SMILE to Database</title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+        <!-- Latest compiled and minified JavaScript -->
+        <script type="text/css" src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+        <!-- Marvin Sketch scripts -->
+        <!-- https://marvinjs-demo.chemaxon.com/6.2/examples/example-molconvert.html -->
+        <!--
+        <link type="text/css" rel="stylesheet" href="../marvin_folder/css/doc.css" />
+        <link type="text/css" rel="stylesheet" href="../marvin_folder/js/lib/rainbow/github.css" />
+        <script src="../marvin_folder/js/lib/rainbow/rainbow-custom.min.js"></script>
+        <script src="../marvin_folder/js/lib/jquery-1.9.1.min.js"></script>
+        <script src="../marvin_folder/js/webservices.js"></script>
+        <script src="../marvin_folder/js/util.js"></script>
+        -->
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/doc.css') }}" />
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='js/lib/rainbow/github.css') }}" />
+        <script src="{{ url_for('static', filename='js/lib/rainbow/rainbow-custom.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/lib/jquery-1.9.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/webservices.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/util.js') }}"></script>
+	<script>
+
+		var marvinSketcherInstance;
+
+		$(document).ready(function handleDocumentReady (e) {
+			getMarvinPromise("#sketch").done(function (sketcherInstance) {
+				marvinSketcherInstance = sketcherInstance;
+
+				$("#getSmilesButton").on("click", function handleGetSmilesButton () {
+					smilesControl.getSmiles();
+				});
+
+				$("#setSmilesButton").on("click", function handleGetSmilesButton () {
+					smilesControl.setSmiles();
+				});
+
+				$("#resetButton").on("click", function handleGetSmilesButton () {
+					smilesControl.reset();
+				});
+
+			}).fail(function () {
+				alert("Cannot retrieve sketcher instance from iframe");
+			});
+		});
+
+		var errorConsole = (function () {
+			var controlObject = {
+				"reset" : function() {
+					$("#error").children("p").html("");
+				}
+				,"print" : function(txt) {
+					$("#error").children("p").html(txt);
+				}
+				,"isEmpty" : function() {
+					return ($("#error").children("p").html() === "");
+				}
+			};
+
+			return controlObject;
+
+		}());
+
+		var smilesControl = (function () {
+
+			function getMolConvertURL() {
+				var ws = getDefaultServices();
+				return ws['molconvertws'];
+			};
+			
+			function handleRequestError (qXHR, textStatus, errorThrown) {
+				if (qXHR.status == 0) { // UNSENT request
+					var errMsg = "ERROR: MolConvert failed.\nThe request has not been sent.\nThe request may violate the cross domain policy.";
+					errorConsole.print(errMsg);
+				} else {
+					errorConsole.print("ERROR: MolConvert failed (status code "+ qXHR.status + ")\n" + qXHR.responseText);
+				}
+			};
+
+			var controlObject = {
+
+				"getSmiles": function getSmiles () {
+					errorConsole.reset();
+					var s = marvinSketcherInstance.exportAsMrv();
+					var	data = JSON.stringify({
+						"structure" : s,
+						"inputFormat" : "mrv",
+						"parameters" : "smiles"
+					});
+
+					$.ajax({
+						"url": getMolConvertURL()
+						,"type": "POST"
+						,"dataType": "json"
+						,"contentType": "application/json"
+						,"data": data
+					}).done(function (data, textStatus, jqXHR) {
+						$("#smiles").val(data['structure']);
+					}).fail(handleRequestError);
+				}
+
+				,"setSmiles": function setSmiles() {
+					errorConsole.reset();
+					var s = $("#smiles").val();
+					if (s == null || s == "") {
+						marvinSketcherInstance.importAsMrv(null);
+					} else {
+						var data = JSON.stringify({
+							"structure" : s,
+							"inputFormat" : "smiles",
+							"parameters" : "mrv"
+						});
+
+						$.ajax({
+							"url": getMolConvertURL()
+							,"type": "POST"
+							,"dataType": "json"
+							,"contentType": "application/json"
+							,"data": data
+						}).done(function (data, textStatus, jqXHR) {
+							marvinSketcherInstance.importAsMrv(data['structure']);
+						}).fail(handleRequestError);
+					}
+				}
+
+				,"reset": function reset () {
+					$("#smiles").val("");
+					errorConsole.reset();
+				}
+			}
+
+			return controlObject;
+
+		}());
+
+	</script>
+    </head>
+    <body>
+        <h2>Add SMILE to Database</h2>
+        <!-- Z. Hu, Marvin Sketch -->
+        <!-- view-source:https://marvinjs-demo.chemaxon.com/6.2/examples/example-molconvert.html -->
+        <div style="margin-right: 30px;" class="col text-center">
+                <input id="getSmilesButton" type="button" value="Get">
+                <input id="setSmilesButton" type="button" value="Set">
+                <input id="resetButton" type="button" value="Reset">
+                <label for="smiles">SMILES</label>
+                <input type="text" id="smiles">
+        </div>
+        <div class="resizable" style="text-align: center">
+                <!--
+                <iframe src="./editor.html" id="sketch" class="sketcher-frame"></iframe>
+                <iframe src="{{ url_for('static', filename='html/editor.html') }}" id="sketch" class="sketcher-frame"></iframe>
+                <iframe src="{{ editor }}" id="sketch" class="sketcher-frame"></iframe>
+                -->
+                <iframe src="{{ iframe }}" id="sketch" class="sketcher-frame"></iframe>
+        </div>
+        <div id="error" style="text-align: center">
+                <p></p>
+        </div>
+        <br>
+        <div class="container p-3 my-3 border">
+            {% from "FormHelpers.html" import render_field %}
+            <form method=post>
+                <dl>
+                <div class="col text-center">
+                    {{ render_field(form.smiles) }}
+                    Separate SMILES by ":"
+                </div>
+                </dl>
+                <div class="col text-center">
+        {#      <input type=submit value=Submit>#}
+                    <button type="submit" class="btn btn-primary center">Submit Request</button>
+                </div>
+            </formdiv>
+    </body>
+</html>
