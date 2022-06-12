@@ -2,6 +2,7 @@
 
 # Project-specified
 *png
+query/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

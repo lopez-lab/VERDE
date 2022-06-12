@@ -5,6 +5,7 @@ import os
 import json
 import glob
 import requests
+import subprocess
 import re
 from flask import Flask, jsonify, request, abort, render_template, Response, send_file
 from flask_wtf import FlaskForm
@@ -34,6 +35,9 @@ df.rename(columns=colDict, inplace=True)
 #smileToImage = pd.read_csv(os.getcwd()+'/data/smileImageMapping.csv')
 smileToImage = pd.read_csv(os.getcwd()+'/data/smileImageMapping_12272020.csv')
 #smileToImage = pd.read_csv(os.getcwd()+'/data/smileImageMapping_05172022.csv')
+
+# Create the query folder if it does not exist and initilize an empty csv file
+subprocess.run("mkdir -p query; touch query/init.csv", shell=True, check=True)
 
 @app.route('/', methods=['GET', 'POST'])
 def dashboard():
